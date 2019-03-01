@@ -1,1 +1,1 @@
-from dispatcher import AsyncSignal
+from .dispatcher import AsyncSignal
