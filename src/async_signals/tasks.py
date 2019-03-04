@@ -33,6 +33,10 @@ def propagate_signal(self, sender, **named):
 
     logger = get_task_logger(__name__)
     logger.info("START propagate_signal")
+    logger.info(self)
+    logger.info(sender)
+    logger.info(_make_id(sender))
+    logger.info(self._live_receivers(_make_id(sender)))
     
     # Call each receiver with whatever arguments it can accept.
     for receiver in self._live_receivers(_make_id(sender)):
