@@ -50,3 +50,9 @@ def propagate_signal(self, sender, **named):
             logger.info("EXCEPT END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
     
     logger.info("END propagate_signal")
+
+
+@shared_task
+def call_receiver(receiver, self, sender, **named):
+    receiver(signal=self, sender=sender, **named)
+    
