@@ -6,9 +6,8 @@ from django.dispatch.dispatcher import (
     Signal,
 )
 
-logger = get_task_logger(__name__)
 
-@shared_task
+@shared_task(ignore_result=True, store_errors_even_if_ignored=True)
 def propagate_signal(self, sender, **named):
     """
     Send signal from sender to all connected receivers catching errors.
@@ -32,6 +31,8 @@ def propagate_signal(self, sender, **named):
     receiver.
     """
 
+    logger = get_task_logger(__name__)
+    
     # Call each receiver with whatever arguments it can accept.
     for receiver in self._live_receivers(_make_id(sender)):
         try:
