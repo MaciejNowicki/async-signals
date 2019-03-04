@@ -24,9 +24,9 @@ class AsyncSignal(Signal):
         logger.info(self)
         logger.info(sender)
         logger.info(_make_id(sender))
-        logger.info(self._live_receivers(_make_id(sender)))
+        logger.info(self._live_receivers(sender))
         
-        for receiver in self._live_receivers(_make_id(sender)):
+        for receiver in self._live_receivers(sender):
             try:
                 logger.info("START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,self,sender,named))
                 call_receiver.apply_async(
