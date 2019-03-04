@@ -1,15 +1,13 @@
 from celery import shared_task
 from celery.utils.log import get_task_logger
 
-
-
 from django.dispatch.dispatcher import (
     _make_id,
     Signal,
 )
 
 
-@shared_task(ignore_result=True, store_errors_even_if_ignored=True)
+@shared_task()
 def propagate_signal(self, sender, **named):
     """
     Send signal from sender to all connected receivers catching errors.
@@ -34,6 +32,7 @@ def propagate_signal(self, sender, **named):
     """
 
     logger = get_task_logger(__name__)
+    logger.info("START propagate_signal")
     
     # Call each receiver with whatever arguments it can accept.
     for receiver in self._live_receivers(_make_id(sender)):
@@ -45,3 +44,5 @@ def propagate_signal(self, sender, **named):
             logger.info("EXCEPT START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
             logger.error(ex)
             logger.info("EXCEPT END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+    
+    logger.info("END propagate_signal")
