@@ -6,7 +6,7 @@ from django.dispatch.dispatcher import (
     Signal,
 )
 
-from .tasks import propagate_signal
+from .tasks import propagate_signal, call_receiver
 
 
 class AsyncSignal(Signal):
@@ -19,8 +19,23 @@ class AsyncSignal(Signal):
     def send(self, sender, **named):
         """Send the signal via Celery."""
 
-        propagate_signal.apply_async(
-            args=(self, sender,),
-            kwargs=named,
-            queue=self.queue,
-        )
+        for receiver in self._live_receivers(_make_id(sender)):
+        try:
+            logger.info("START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+            call_receiver.apply_async(
+                args=(receiver, self, sender,),
+                kwargs=named,
+                queue=self.queue,
+            )
+            logger.info("END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+        except Exception as ex:
+            logger.info("EXCEPT START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+            logger.error(ex)
+            logger.info("EXCEPT END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+    
+        
+#         propagate_signal.apply_async(
+#             args=(self, sender,),
+#             kwargs=named,
+#             queue=self.queue,
+#         )
