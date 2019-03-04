@@ -7,7 +7,7 @@ from django.dispatch.dispatcher import (
 )
 
 
-@shared_task()
+@shared_task
 def propagate_signal(self, sender, **named):
     """
     Send signal from sender to all connected receivers catching errors.
