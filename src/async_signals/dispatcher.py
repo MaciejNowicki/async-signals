@@ -1,9 +1,12 @@
 from celery import shared_task
+from celery.utils.log import get_task_logger
+
 from django.dispatch.dispatcher import (
     _make_id,
     Signal,
 )
 
+logger = get_task_logger(__name__)
 
 @shared_task
 def propagate_signal(self, sender, **named):
@@ -32,9 +35,13 @@ def propagate_signal(self, sender, **named):
     # Call each receiver with whatever arguments it can accept.
     for receiver in self._live_receivers(_make_id(sender)):
         try:
+            logger.info("START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
             receiver(signal=self, sender=sender, **named)
-        except Exception:
-            pass
+            logger.info("END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+        except Exception as ex:
+            logger.info("EXCEPT START Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
+            logger.error(ex)
+            logger.info("EXCEPT END Receiver: {}; Signal: {}; sender: {}, kwargs:{}".format(receiver,signal,sender,named))
 
 
 class AsyncSignal(Signal):
