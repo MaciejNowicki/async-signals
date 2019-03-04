@@ -16,7 +16,7 @@ class AsyncSignal(Signal):
         """Send the signal via Celery."""
 
         self.propagate_signal.apply_async(
-            args=(sender),
+            args=(sender,),
             kwargs=named,
             queue=self.queue,
         )
